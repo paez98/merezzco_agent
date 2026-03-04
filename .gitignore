@@ -1,0 +1,5 @@
+.venv
+n8n_data
+__pycache__/
+.vscode
+.idea
