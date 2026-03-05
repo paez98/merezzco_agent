@@ -1,5 +1,7 @@
 # 🤖 AI Sales Agent – Conversational Quoting & Order Management System
 
+[Spanish docs 🇪🇸 ](README.es.md)
+
 Production-ready conversational AI agent designed to automate customer interactions, generate personalized quotes, provide intelligent recommendations, and manage order workflows within a real business process.
 
 This project demonstrates how to build a structured LLM-powered backend system using clean architecture principles and contextual conversation processing.
