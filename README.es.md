@@ -1,5 +1,7 @@
 # 🤖 Agente de Ventas con IA – Cotización y Gestión de Pedidos
 
+[Docs. en ingles 🇺🇸](README.md)
+
 Agente conversacional diseñado para automatizar la atención al cliente, generar cotizaciones personalizadas, ofrecer recomendaciones inteligentes y gestionar pedidos dentro de un flujo comercial real.
 
 Este proyecto demuestra cómo construir un sistema backend basado en LLM utilizando principios de arquitectura limpia y procesamiento estructurado del contexto conversacional.
