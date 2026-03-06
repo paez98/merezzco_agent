@@ -7,7 +7,14 @@ def extract_message(ai_msg: dict):
         return messages[-1]
 
 
-def request_agent(chat_id: str, message: str):
+def request_agent(form_data: dict):
+    message = form_data.get("data").get("message")
+    chat_id = form_data.get("chat_id")
+
+    if form_data.get("data").get("img_b64"):
+        img = form_data["data"]
+        ai_msg = agente.generar(chat_id, message, img)
+
     ai_msg = agente.generar(chat_id, message)
 
     response = extract_message(ai_msg=ai_msg)

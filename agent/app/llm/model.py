@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from langchain_core.messages.tool import tool_call
+from typing import Optional
 
 from agent.app.llm.tools.cotizacion import cotizar_torta
 
@@ -9,6 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.messages import HumanMessage, SystemMessage, ToolMessage
 from langchain.agents import create_agent
 from langgraph.checkpoint.sqlite import SqliteSaver
+from langchain_core.messages.tool import tool_call
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -19,7 +20,7 @@ class MerezzcoAgent:
         self.tools = [cotizar_torta]
         self.llm = ChatGoogleGenerativeAI(
             api_key=api_key,
-            model="gemini-3-flash-preview",
+            model="gemini-2.5-flash-tts",
             verbose=True,
         )
         self.tools_executor = {tool.name: tool for tool in self.tools}
@@ -74,7 +75,7 @@ Cuéntame… ¿qué se te antoja hoy? ¿Un pastel especial, algo para un evento 
 - Nunca comentar/preguntar sobre reservar/apartar al cliente.
 
 1. Solo si el cliente saluda sin decir nada mas, enviar el mensaje de bienvenida!.
-   
+
 
 2. Si pregunta precios sin dar detalles:
     Envia el siguiente mensaje obligatoriamente:
@@ -82,13 +83,13 @@ Cuéntame… ¿qué se te antoja hoy? ¿Un pastel especial, algo para un evento 
 
         Tenemos opciones desde mini cakes hasta tortas de 2 pisos 🎂,
         ideales para cumpleaños, aniversarios, baby showers y más.
-    
+
         Nuestros precios comienzan desde 16$ y varían según el tamaño y diseño.
-    
+
         Para recomendarte la mejor opción, cuéntame:
         ▬ ¿Para cuántas personas?
         ▬ ¿Tienes algún diseño o temática en mente?
-    
+
         Así puedo enviarte un presupuesto exacto 🥰    
 
 3. Antes de cotizar, siempre solicita:
@@ -128,14 +129,24 @@ Indica que con esos datos podrás enviar un presupuesto exacto.
         messages = state.get("values").get("messages")
         return messages
 
-    def generar(self, user_id: str, message: str):
-
+    def generar(self, user_id: str, message: str, img_base64: Optional[str] = None):
         config = {"configurable": {"thread_id": user_id}}
 
         ai_msg = self.agent_exec.invoke(
-            {"messages": [{"role": "user", "content": f"{message}"}]}, config=config
+            {
+                "messages": [
+                    {"role": "user", "content": f"{message}"},
+                    {"role": "user", "content": img_base64},
+                ]
+            },
+            config=config,
         )
         return ai_msg
 
 
 agente = MerezzcoAgent()
+
+agente.generar(
+    "1",
+    "describe la imagen",
+)
