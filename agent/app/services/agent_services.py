@@ -12,10 +12,11 @@ def request_agent(form_data: dict):
     chat_id = form_data.get("chat_id")
 
     if form_data.get("data").get("img_b64"):
-        img = form_data["data"]
-        ai_msg = agente.generar(chat_id, message, img)
+        img = form_data.get("data").get("img_b64")
+        ai_msg = agente.generate(chat_id, message, img)
 
-    ai_msg = agente.generar(chat_id, message)
+    else:
+        ai_msg = agente.generate(chat_id, message)
 
     response = extract_message(ai_msg=ai_msg)
     text = response.content

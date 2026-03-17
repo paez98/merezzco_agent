@@ -5,11 +5,11 @@ from typing import Optional
 from agent.app.llm.tools.cotizacion import cotizar_torta
 
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.messages import HumanMessage, SystemMessage, ToolMessage
+from langchain.messages import HumanMessage
 from langchain.agents import create_agent
 from langgraph.checkpoint.sqlite import SqliteSaver
-from langchain_core.messages.tool import tool_call
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -20,10 +20,11 @@ class MerezzcoAgent:
         self.tools = [cotizar_torta]
         self.llm = ChatGoogleGenerativeAI(
             api_key=api_key,
-            model="gemini-2.5-flash-tts",
+            model="gemini-3.1-pro-preview",
             verbose=True,
         )
-        self.tools_executor = {tool.name: tool for tool in self.tools}
+
+        # self.tools_executor = {tool.name: tool for tool in self.tools}
         self.system_prompt = """Tu nombre es Ares y eres el encargado de Merezzco Bakery 🤎
 
 Tu personalidad es cercana, profesional y carismática. 
@@ -129,24 +130,28 @@ Indica que con esos datos podrás enviar un presupuesto exacto.
         messages = state.get("values").get("messages")
         return messages
 
-    def generar(self, user_id: str, message: str, img_base64: Optional[str] = None):
+    def generate(self, user_id: str, message: str, img_base64: Optional[str] = None):
         config = {"configurable": {"thread_id": user_id}}
 
-        ai_msg = self.agent_exec.invoke(
-            {
-                "messages": [
-                    {"role": "user", "content": f"{message}"},
-                    {"role": "user", "content": img_base64},
+        if img_base64:
+            msg = HumanMessage(
+                content=[
+                    {"type": "text", "text": message},
+                    {
+                        "type": "image",
+                        "base64": img_base64,
+                        "mime_type": "image/jpg",
+                    },
                 ]
-            },
+            )
+
+        else:
+            msg = HumanMessage(content=[{"type": "text", "text": message}])
+        ai_msg = self.agent_exec.invoke(
+            {"messages": [msg]},
             config=config,
         )
         return ai_msg
 
 
 agente = MerezzcoAgent()
-
-agente.generar(
-    "1",
-    "describe la imagen",
-)
